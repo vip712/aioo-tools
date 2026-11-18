@@ -2,22 +2,157 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>加密工具矩阵 · Crypto Tool Matrix — 即将上线</title>
-<style>
-:root{color-scheme:dark}
-body{font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#0f1420;color:#e8eaf0;margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center;padding:24px}
-h1{font-size:2rem;margin:0 0 12px}
-p{color:#9aa3b2;line-height:1.8;margin:8px 0}
-.badge{display:inline-block;border:1px solid #2a3348;border-radius:999px;padding:4px 14px;font-size:.8rem;color:#8b95a9;margin-bottom:16px}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIOO · 加密工具矩阵 Crypto Tool Matrix — 免费工具 + 咨询 + 课程</title>
+<meta name="description" content="一个工具，一个页面。BTC手续费估算、ETH Gas实时、汇率换算、钱包二维码、收益计算 — 免费即用。需要更深帮助？USDT/USDC付费咨询与定制开发。">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<main>
-<div class="badge">aioo.duckdns.org</div>
-<h1>🧰 加密工具矩阵</h1>
-<p>一个工具，一个页面。<br>BTC 手续费估算、ETH Gas 实时、汇率换算、钱包二维码……正在逐个上线。</p>
-<p lang="en">One tool, one page. Crypto micro-tools launching soon.</p>
-</main>
+<!-- aioo-member-cta --><div class="aioo-member-cta" style="position:fixed;top:80px;right:14px;z-index:99999;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif"><a href="/members/?lang=zh" style="background:#f59e0b;color:#1a1a1a;padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;line-height:1;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.28)">会员注册 · 免费试用30天</a><a href="/members/?lang=zh" style="background:rgba(13,20,36,.92);color:#e8eef7;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;line-height:1;text-decoration:none;border:1px solid rgba(255,255,255,.4);box-shadow:0 4px 14px rgba(0,0,0,.28)">会员登录</a></div>
+<header class="nav">
+  <div class="logo">AIOO<span>.</span></div>
+  <nav>
+    <a href="#tools">免费工具</a><a href="#services">付费服务</a><a href="#pricing">价格</a><a href="/members/?lang=zh">会员注册 · 免费30天</a><a href="#pay">扫码付款</a><a href="#course">课程候补</a><a href="#faq">FAQ</a><a href="https://t.me/aiiox_bot" target="_blank" rel="noopener">Telegram 客服</a>
+  </nav>
+  <a class="btn small" href="#pricing">USDT 付款咨询 →</a>
+</header>
+
+<section class="hero">
+  <div class="badge">FREE TOOLS · PAY IN CRYPTO · NO SIGN-UP</div>
+  <h1>一个工具，解决一个问题。<br><span>10秒用完，即走。</span></h1>
+  <p class="sub">BTC 手续费估算、ETH Gas 实时、币价换算、钱包收款二维码、盈亏计算 — 全部免费、无需注册。<br>卡在更复杂的问题上？用 USDT / USDC 预约 1对1，把问题一次解决。</p>
+  <div class="cta">
+    <a class="btn primary" href="#tools">立即用免费工具 ↓</a>
+    <a class="btn ghost" href="#services">我有问题要咨询</a>
+  </div>
+  <div class="trust">✓ 无需注册 &nbsp; ✓ 数据走公开API &nbsp; ✓ 支持 USDT / USDC / BTC / ETH &nbsp; ✓ 中英文</div>
+  <div class="live-price" id="livePrice">正在加载实时价格 BTC / ETH / USDT ...</div>
+</section>
+
+<section id="tools" class="section">
+  <h2>🛠 免费工具矩阵</h2>
+  <p class="section-sub">每个工具都是获客入口：用户搜问题进来 → 免费解决小问题 → 遇到大问题自然付费咨询。这就是稳定流量模型。</p>
+
+  <div class="grid">
+    <!-- Price Converter -->
+    <div class="card">
+      <h3>💱 币价换算器</h3>
+      <label>金额 <input id="convAmount" type="number" value="1"></label>
+      <label>从 <select id="convFrom"><option>BTC</option><option>ETH</option><option selected>USDT</option><option>USDC</option></select></label>
+      <label>到 <select id="convTo"><option selected>USD</option><option>CNY</option><option>EUR</option><option>BTC</option><option>ETH</option></select></label>
+      <button onclick="convertPrice()">换算</button>
+      <div class="result" id="convResult">输入后点击换算（实时 CoinGecko 价格）</div>
+    </div>
+
+    <!-- BTC Fee -->
+    <div class="card">
+      <h3>⛽ BTC 手续费估算</h3>
+      <p>当前网络推荐费率（mempool.space 实时）</p>
+      <button onclick="loadBtcFee()">刷新费率</button>
+      <div class="result" id="btcFee">点击刷新获取：快 / 中 / 慢 三档 sat/vB</div>
+    </div>
+
+    <!-- ETH Gas -->
+    <div class="card">
+      <h3>🔥 ETH Gas 实时</h3>
+      <p>通过公共 RPC 节点查询当前 Gas Price</p>
+      <button onclick="loadEthGas()">刷新 Gas</button>
+      <div class="result" id="ethGas">点击刷新获取 Gwei 与普通转账预估成本</div>
+    </div>
+
+    <!-- QR -->
+    <div class="card">
+      <h3>📷 钱包收款二维码</h3>
+      <label>钱包地址 / 任意文本 <input id="qrText" placeholder="粘贴你的钱包地址"></label>
+      <button onclick="makeQr()">生成二维码</button>
+      <div class="result center" id="qrResult">二维码会显示在这里，可截图收款</div>
+    </div>
+
+    <!-- Profit -->
+    <div class="card">
+      <h3>📈 盈亏计算器</h3>
+      <label>买入价 <input id="buyPrice" type="number" placeholder="10000"></label>
+      <label>卖出价 <input id="sellPrice" type="number" placeholder="12000"></label>
+      <label>数量 <input id="qty" type="number" placeholder="0.5"></label>
+      <button onclick="calcProfit()">计算盈亏</button>
+      <div class="result" id="profitResult">算算这笔赚了多少、涨幅 %</div>
+    </div>
+
+    <!-- Payment Generator -->
+    <div class="card highlight">
+      <h3>💳 生成 USDT 收款单</h3>
+      <label>金额 (USDT) <input id="payAmount" type="number" value="29"></label>
+      <label>网络 <select id="payNetwork"><option value="USDT_TRC20">USDT · TRC-20 (波场, 推荐)</option><option value="USDT_ERC20">USDT · ERC-20 (以太坊)</option><option value="USDT_BEP20">USDT · BEP-20 (BNB Chain)</option><option value="USDT_POLYGON">USDT · Polygon</option><option value="USDT_ARBITRUM">USDT · Arbitrum</option><option value="USDT_OPTIMISM">USDT · Optimism</option><option value="USDC_ERC20">USDC · ERC-20 / EVM</option><option value="ETH">ETH · EVM</option><option value="BTC_SEGWIT">BTC · SegWit (bc1)</option><option value="BTC_LEGACY">BTC · Legacy</option><option value="XMR">XMR · 门罗币</option></select></label>
+      <button onclick="makePayment()">生成收款二维码</button>
+      <div class="result center" id="payResult">商家/自由职业者可直接发给客户收款</div>
+    </div>
+  </div>
+</section>
+
+<section id="services" class="section alt">
+  <h2>💼 工具解决不了的，我来解决</h2>
+  <div class="grid">
+    <div class="card"><h3>1对1问题咨询</h3><p>钱包使用、转账翻车、交易所选择、工具选型、职场/行业问题结合咨询。先用免费工具自查，解决不了再约我，不浪费你钱。</p></div>
+    <div class="card"><h3>定制小工具开发</h3><p>你有个重复算、重复查的烦事？做成一个页面工具给你/你的客户用。199 USDT 起，先聊需求再报价。</p></div>
+    <div class="card"><h3>小团队培训 / 内训</h3><p>基于我的职场/行业实战经验做分享和 SOP 模板，不是纯理论。按场报价，USDT/USDC 结算。</p></div>
+    <div class="card"><h3>定制情报调研</h3><p>想查一个供应商靠不靠谱、一个市场值不值得进、一项政策怎么落地？我们多源搜集 + 交叉核实，给你一份能直接拿来决策的简报。49 USDT 起，先聊需求定范围再报价，最快 48 小时交付。</p></div>
+    <div class="card"><h3>资源对接</h3><p>你有需求，或者手里有资源（渠道、货源、服务、流量），登记给客服机器人，我们帮你对接合适的另一方。对接成功才收服务费，双方自行结算 — 我们只做信息对接，不经手任何资金。</p></div>
+    <div class="card"><h3>行业简报订阅</h3><p>加密早报的付费深度版：空投精选、低费窗口提醒、重点赛道跟踪。免费版每天在 Telegram 频道「<a href="https://t.me/cromsg" target="_blank" rel="noopener">加密脉动 CryptoPulse</a>」更新，先看免费版，再决定要不要深度版。</p></div>
+    <div class="card"><h3>音视频转录 + 摘要</h3><p>发一段录音或视频，拿到三件成品：逐字稿 + .srt 字幕 + 结构化摘要（结论 / 要点 / 待办）。中文 / 英文 / 日文都行，还能跨语言出摘要，比如日文会议出中文摘要。全程在我们自己的机器上处理，不经过任何第三方 AI 云，交付后 7 天删除文件。正常 12 小时内、最长 48 小时交付。注册会员后自助上传下单，用余额支付。</p></div>
+  </div>
+</section>
+
+<section id="pricing" class="section">
+  <h2>💰 定价 — 稳定币付款，全球可付</h2>
+  <div class="grid pricing">
+    <div class="card"><h3>免费</h3><div class="price">$0</div><p>全部在线工具<br>无需注册<br>无限次使用</p><a class="btn ghost" href="#tools">开始使用</a></div>
+    <div class="card highlight"><h3>30分钟咨询</h3><div class="price">29 USDT</div><p>1对1语音/文字<br>问题清单预审<br>结论+行动步骤</p><button onclick="quickPay(29)">用 USDT 付款预约</button></div>
+    <div class="card"><h3>60分钟深度咨询</h3><div class="price">49 USDT</div><p>深度诊断 + 书面方案<br>模板/SOP 附赠<br>7天内一次答疑</p><button onclick="quickPay(49)">用 USDT 付款预约</button></div>
+  </div>
+  <div class="grid pricing">
+    <div class="card"><h3>定制情报调研</h3><div class="price">49 USDT 起</div><p>供应商核查 / 市场调研<br>政策梳理 / 多语言资料包<br>先定范围再报价</p><a class="btn ghost" href="https://t.me/aiiox_bot" target="_blank" rel="noopener">找客服下单</a></div>
+    <div class="card"><h3>资源对接</h3><div class="price">29 USDT 起</div><p>登记需求或资源免费<br>对接成功才收服务费<br>双方自行结算</p><a class="btn ghost" href="https://t.me/aiiox_bot" target="_blank" rel="noopener">找客服登记</a></div>
+    <div class="card"><h3>简报深度版订阅</h3><div class="price">19 USDT/月</div><p>空投精选 + 低费窗口<br>重点赛道跟踪<br>注册会员先免费试用 30 天（中/英双语）</p><a class="btn ghost" href="/members/?lang=zh">注册会员 · 免费30天</a></div>
+    <div class="card"><h3>转录 + 摘要</h3><div class="price">9 USDT / 30 分钟</div><p>逐字稿 + .srt 字幕 + 结构化摘要<br>免费试用：5 次，每次 ≤5 分钟<br>超时每 30 分钟 +6 USDT · 加急 ×1.5<br>支持注册会员 + 加密货币充值余额支付</p><a class="btn ghost" href="https://aioo.duckdns.org/members/transcribe">自助上传下单</a></div>
+  </div>
+  <p class="note">付款流程：点上方按钮 → 扫码或复制地址转账 → 保存 TxID, 通过 <a href="https://t.me/aiiox_bot" target="_blank" rel="noopener">Telegram 客服 @aiiox_bot</a> 发给我们确认, 24h 内排期。推荐 TRC20（手续费最低）。其他网络见下方「扫码付款」区。</p>
+  <div class="result center" id="quickPayResult"></div>
+</section>
+
+<section id="pay" class="section alt">
+  <h2>📷 扫码付款 — 全部收款地址</h2>
+  <p class="section-sub">每个地址都有独立二维码, 用钱包扫码即可付款。转账前务必核对：<b>币种 + 网络 + 地址</b> 三者一致, 选错网络可能导致资产丢失。</p>
+  <div class="grid" id="walletGrid">正在加载收款地址…</div>
+  <p class="note">支持 USDT (TRC-20 / ERC-20 / BEP-20 / Polygon / Arbitrum / Optimism)、USDC、ETH、BTC (SegWit + Legacy)、XMR。EVM 多链共用同一个地址, 但各链资产独立, 请按你钱包所在的链转账。</p>
+  <p class="note">付款后请把 <b>网络 + TxID</b> 发给 <a href="https://t.me/aiiox_bot" target="_blank" rel="noopener">Telegram 客服 @aiiox_bot</a> 确认到账和预约; 没有 Telegram 也可以发邮件到 <a href="mailto:aieiu@outlook.com">aieiu@outlook.com</a>。客服由站长的 AI 助手值守, 一般问题直接处理, 需要站长确认的会转交站长。客服绝不会向你索要私钥/助记词。</p>
+</section>
+
+<section id="course" class="section alt">
+  <h2>🎓 课程候补名单</h2>
+  <p>我正在基于自己的职场/行业经验打磨一门实战课（不是泛 AI 理论课）。加入候补，上线享早鸟价，并优先获得免费工具 Pro 版。</p>
+  <form onsubmit="joinWaitlist(event)" class="waitlist">
+    <input id="wlContact" placeholder="邮箱 / Telegram / 微信" required>
+    <button type="submit">加入候补 →</button>
+  </form>
+  <div class="result center" id="wlResult"></div>
+</section>
+
+<section id="faq" class="section">
+  <h2>FAQ</h2>
+  <details><summary>工具收费吗？数据准吗？</summary><p>工具免费，价格/Gas 走 CoinGecko、mempool.space、公共 RPC 等公开 API，仅供参考，交易前请在钱包里二次确认。</p></details>
+  <details><summary>为什么用 USDT/USDC 收款？</summary><p>跨境无障碍、到账快、手续费低（尤其 TRC20）、不受平台抽成和地域支付限制。法币咨询也可先私聊协商。</p></details>
+  <details><summary>付了款没人理怎么办？</summary><p>每笔付款用 TxID 对单，确认后排期。若 48h 未确认，可凭 TxID 申请原路退回（扣除网络费）。</p></details>
+  <details><summary>你能帮我代投/带单吗？</summary><p>不能。本站只提供工具、教育与咨询，不提供投资建议、不代客理财。</p></details>
+</section>
+
+<footer>
+  <p><strong>AIOO · aioo.duckdns.org</strong> — One tool, one page.</p>
+  <p>收款：USDT · USDC · BTC · ETH · XMR — 地址与二维码见上方「扫码付款」区</p>
+  <p>客服：<a href="https://t.me/aiiox_bot" target="_blank" rel="noopener">Telegram @aiiox_bot</a> · 邮箱：<a href="mailto:aieiu@outlook.com">aieiu@outlook.com</a>（AI 助手一线值守, 复杂问题转站长）</p>
+  <p class="small">免责声明：本站工具与内容仅供信息与教育用途，不构成投资、法律或税务建议。加密资产价格波动大，请自行尽调。</p>
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
